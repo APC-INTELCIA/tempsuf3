@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<head>    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        var openWeatherAppId = '4b5de724b7031493ca3719b985fca9a3',
+          openWeatherUrl = 'http://api.openweathermap.org/data/2.5/forecast'
+
+        var prepararDades = function(unitats) {
+            var nomCiutat = $('#nom-ciutat').val()
+            if (nomCiutat && nomCiutat != ''){
+                nomCiutat = nomCiutat.trim()
+                getData(openWeatherUrl, nomCiutat, openWeatherAppId, unitats)
+            }
+            else {
+                alert('Si us plau entra el nom de la ciutat')
+            }
+        }
+
+        var prepararDades2 = function(unitats) {
+            var nomCiutat = $('#nom-ciutat').val()
+            if (nomCiutat && nomCiutat != ''){
+                nomCiutat = nomCiutat.trim()
+                getData2(openWeatherUrl, nomCiutat, openWeatherAppId, unitats)
+            }
+            else {
+                alert('Si us plau entra el nom de la ciutat')
+            }
+        }
+
+        $(document).ready(function(){
+            $('.btn-metric').click(function() {
+                prepararDades('metric')
+            })
+            $('.btn-imperial').click(function() {
+                prepararDades('imperial')
+            })
+        })
+
+        $(document).ready(function(){
+            $('.btn-metric').click(function() {
+                prepararDades2('metric')
+            })
+            $('.btn-imperial').click(function() {
+                prepararDades2('imperial')
+            })
+        })
+
+        function getData (url, nomCiutat, appId, unitats) {
+            var request = $.ajax({
+                url: url,
+                dataType: 'jsonp',
+                data: {
+                    q: nomCiutat,
+                    appid: appId,
+                    units: unitats
+                },
+                jsonpCallback: 'cercarDades',
+                type: 'GET'
+            }).fail(function(error){
+                console.error(error)
+                alert('Error enviant la peticio')
+            })
+        }
+
+        function getData2 (url, nomCiutat, appId, unitats) {
+            var request = $.ajax({
+                url: url,
+                dataType: 'jsonp',
+                data: {
+                    q: nomCiutat,
+                    appid: appId,
+                    units: unitats
+                },
+                jsonpCallback: 'cercarDades2',
+                type: 'GET'
+            }).fail(function(error){
+                console.error(error)
+                alert('Error enviant la peticio')
+            })
+        }
+
+        function cercarDades (previsio) {
+            var html = ''            
+            html += '<div class="text-center p-4">'+
+                '<h2>Temperatura Per Hores</h2>'
+                +'</div>'
+            previsio.list.forEach(function(previsioEntry, index, list){
+                html+='<div class="row d-flex flex-wrap justify-content-center align-items-center h-100">'
+        +'<div class="col-md-8 col-lg-6 col-xl-4">'            
+            +'<div class="card shadow mb-3 bg-body" style="border-style:solid;color:#black;border-radius:10px;">'
+              +'<div class="card-body p-4">'    
+                  + '<div class="text-center">'
+                  + '<h5 class="font-weight-bold text-center" style="color: #1C2331;">'+previsioEntry.dt_txt+'</h5>'
+                    
+                    +'<img class="tamanyo" src="http://openweathermap.org/img/w/'
+                    +previsioEntry.weather[0].icon
+                    +'.png" />'
+                    + '<br>'
+                    +'<h6 class="display-4 mb-0 font-weight-bold text-center" style="color: #1C2331;">'+previsioEntry.main.temp+'º</h6>'
+                    + '</div>'
+                    +'</div>'
+           
+          +'</div>'
+        +'</div>'
+        +'</div>'
+            })
+
+            $('#log').html(html)
+        }        
+
+        function cercarDades2 (previsio2) {
+            var html = '',
+                nomCiutat2 = previsio2.city.name,
+                country2 = previsio2.city.country,
+                temperatura2 = previsio2.list[0].main.temp,
+                temperaturaMax2 = previsio2.list[0].main.temp_max,
+                temperaturaMin2 = previsio2.list[0].main.temp_min,
+                humedad2 = previsio2.list[0].main.humidity,
+                presion2 = previsio2.list[0].main.pressure,
+                feel2 = previsio2.list[0].main.feels_like,
+                pronostico2 = previsio2.list[0].weather[0].description,
+                icon2 = previsio2.list[0].weather[0].icon,
+                cielo2 = previsio2.list[0].weather[0].main,
+                viento2 = previsio2.list[0].wind.speed
+           
+html+='<div class="row d-flex justify-content-center align-items-center h-100">'
+        +'<div class="col-md-8 col-lg-6 col-xl-8">'            
+            +'<div class="card shadow mb-5 bg-body" style="border-style:solid;color:#black;border-radius:10px;">'
+              +'<div class="card-body p-4">'    
+                +'<div class="d-flex">'
+                  +'<h3 class="flex-grow-1">'+nomCiutat2+ ', '+ country2+'</h3>'
+                +'</div>'    
+                +'<div class="d-flex flex-column text-center mt-2 mb-2">'
+                    +'<div>'
+                        +'<img class="tamanyo" src="http://openweathermap.org/img/w/'+icon2+'.png" />'
+                      +'</div>'
+                  +'<h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331;">'+temperatura2+'º</h6>'
+                  +'<span class="small" style="color: #868B94">'+pronostico2+'</span>'
+                +'</div>'
+                +'<div class="d-flex align-items-center">'
+                  +'<div class="flex-grow-1" style="font-size: 1rem;">'
+                    +'<div><i class="fas fa-wind fa-fw" style="color: #868B94"></i> <span class="ms-1">Temperatura Max: '+'<strong>'+temperaturaMax2+'º'+'</strong>'+'</span></div>'
+                    +'<div><i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1">Temperatura Min: '+'<strong>'+temperaturaMin2+'º'+'</strong>'+'</span></div>'
+                    +'<div><i class="fas fa-sun fa-fw" style="color: #868B94;"></i> <span class="ms-1">Sensación Térmica: '+'<strong>'+feel2+'º'+'</strong>'+'</span></div>'
+                  +'</div>'
+                  +'<div class="flex-grow-1" style="font-size: 1rem;">'
+                    +'<div><i class="fas fa-wind fa-fw" style="color: #868B94;"></i> <span class="ms-1">Humedad: '+'<strong>'+humedad2+'</strong>'+'</span></div>'
+                    +'<div><i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1">Presión: '+'<strong>'+presion2+'</strong>'+'</span></div>'
+                    +'<div><i class="fas fa-sun fa-fw" style="color: #868B94;"></i> <span class="ms-1">Pronóstico: '+'<strong>'+pronostico2+'</strong>'+'</span></div>'
+                  +'</div>'     
+                  +'<div class="flex-grow-1" style="font-size: 1rem;">'
+                    +'<div><i class="fas fa-wind fa-fw" style="color: #868B94;"></i> <span class="ms-1">Cielo: '+'<strong>'+cielo2+'</strong>'+'</span></div>'
+                    +'<div><i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1">Viento: '+'<strong>'+viento2+'</strong>'+'</span></div>'
+                    +'<div><i class="fas fa-sun fa-fw" style="color: #868B94;"></i> <span class="ms-1">Calidad Aire: '+'<strong>Buena</strong>'+'</span></div>'
+                  +'</div>'              
+                +'</div>'   
+              +'</div>'
+            +'</div>'   
+          +'</div>'
+        +'</div>'
+
+            $('#log2').html(html)
+        }
+    </script>
+
+<link href="css/headers.css" rel="stylesheet">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+
+<style>.masthead {
+    height:auto;
+    min-height:auto;
+    background-image: url('https://source.unsplash.com/BtbjCFUvBXs/1920x1080');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 40px;        
+  }
+
+  .tamanyo{
+      width: 100px;
+  }
+  
+  </style>
+</head>
+<body>
+
+<main> 
+
+    <header class="p-3 bg-light text-dark shadow mb-3 bg-body rounded" >
+        <div class="container">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">            
+            <img src="imagenes/descarga.png" width="40" height="32" style="border-radius:100%;margin-right:20px;" /> 
+            <h2 class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">INS Caparrella</h2>    
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+              <input type="search" class="form-control form-control-dark" placeholder="Entra el nom de la ciutat" aria-label="Search" id="nom-ciutat" value="">
+            </form>    
+            <div class="text-end">
+              <button type="button" class="btn btn-primary me-2 btn-metric">Previsió en graus celsius</button>
+              <button type="button" class="btn btn-warning btn-imperial">Previsió amb fahrenheit</button>
+            </div>
+          </div>
+        </div>
+    </header>
+
+    <section class="masthead bg-light shadow">
+        <div class="container h-100">
+          <div class="row h-100 align-items-center">
+            <div class="col-12 text-center">
+              <h1 class="fw-light">Aplicació del temps</h1>
+              <p class="lead">Entra el nom d'una ciutat per consultar la previsió del temps</p>
+              <div id="log2"></div>                                 
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+      
+      <!-- Page Content -->
+      <section class="py-2">
+        <div class="container">
+            <div id="log"></div>
+        </div>
+      </section>   
+    
+</main>
+
+<footer id="sticky-footer" class="flex-shrink-0 py-4 bg-dark text-white-50">
+    <div class="container text-center">
+      <small>Creado por: <strong>Alejandro Pereira</strong> M04 UF3</small>
+    </div>
+  </footer>
+</body>
+</html>
